@@ -1,14 +1,27 @@
-// server/db.js
-const Database = require('better-sqlite3');
-const path = require('path');
-const fs = require('fs');
 
-const DB_FILE = process.env.SQLITE_FILE || path.join(__dirname, '../data/nblasst.db');
+// server.js
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
-// ensure data folder
-const dataDir = path.dirname(DB_FILE);
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+const usersRouter = require("./routes/users");
+const workoutsRouter = require("./routes/workouts");
+const matchRouter = require("./routes/match");
 
-const db = new Database(DB_FILE);
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
 
-module.exports = db;
+// ROUTES
+app.use("/users", usersRouter);
+app.use("/workouts", workoutsRouter);
+app.use("/match", matchRouter);
+
+// Root endpoint
+app.get("/", (req, res) => {
+  res.send("NBLASST backend is running!");
+});
+
+// Start server
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
